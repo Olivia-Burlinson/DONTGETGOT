@@ -1,7 +1,7 @@
 from nicegui import ui
 import requests
 
-API_URL = 'http://localhost:8000/api'
+API_URL = 'http://localhost:8080/api'
 
 class GameState:
     def __init__(self):
