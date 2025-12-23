@@ -1,26 +1,23 @@
-
 from django.contrib import admin
-from .models import Game, Player, Mission, PlayerMission
-
-@admin.register(Game)
-class GameAdmin(admin.ModelAdmin):
-    list_display = ['code', 'name', 'created_at', 'is_active', 'player_count']
-    list_filter = ['is_active', 'created_at']
-    search_fields = ['code', 'name']
-
-    def player_count(self, obj):
-        return obj.players.count()
-    player_count.short_description = 'Players'
+from .models import Player, Mission, PlayerMission
 
 @admin.register(Player)
 class PlayerAdmin(admin.ModelAdmin):
-    list_display = ['name', 'game', 'score', 'joined_at']
-    list_filter = ['game', 'joined_at']
-    search_fields = ['name', 'game__code']
+    list_display = ['name', 'score', 'completed_missions_count', 'catches_count', 'joined_at', 'last_active']
+    search_fields = ['name']
+    readonly_fields = ['joined_at', 'last_active']
+
+    def completed_missions_count(self, obj):
+        return obj.completed_missions_count
+    completed_missions_count.short_description = 'Completed'
+
+    def catches_count(self, obj):
+        return obj.catches_count
+    catches_count.short_description = 'Catches'
 
 @admin.register(Mission)
 class MissionAdmin(admin.ModelAdmin):
-    list_display = ['text_preview', 'difficulty', 'points', 'is_daily', 'date']
+    list_display = ['text_preview', 'difficulty', 'points', 'is_daily', 'date', 'times_completed', 'times_caught']
     list_filter = ['difficulty', 'is_daily']
     search_fields = ['text']
 
@@ -30,7 +27,7 @@ class MissionAdmin(admin.ModelAdmin):
 
 @admin.register(PlayerMission)
 class PlayerMissionAdmin(admin.ModelAdmin):
-    list_display = ['player', 'mission_preview', 'status', 'assigned_at']
+    list_display = ['player', 'mission_preview', 'status', 'assigned_at', 'completed_at']
     list_filter = ['status', 'assigned_at']
     search_fields = ['player__name', 'mission__text']
 

@@ -1,31 +1,33 @@
 from django.db import models
 from django.utils import timezone
 
-class Game(models.Model):
-    code = models.CharField(max_length=6, unique=True)
-    name = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
-    started_at = models.DateTimeField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"{self.name} ({self.code})"
-
-    class Meta:
-        ordering = ['-created_at']
-
 class Player(models.Model):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='players')
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     score = models.IntegerField(default=0)
     joined_at = models.DateTimeField(auto_now_add=True)
+    last_active = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['game', 'name']
         ordering = ['-score', 'name']
 
     def __str__(self):
-        return f"{self.name} in {self.game.code}"
+        return f"{self.name} ({self.score} pts)"
+
+    @property
+    def completed_missions_count(self):
+        return self.missions.filter(status='completed').count()
+
+    @property
+    def caught_missions_count(self):
+        return self.missions.filter(status='caught').count()
+
+    @property
+    def active_missions_count(self):
+        return self.missions.filter(status='active').count()
+
+    @property
+    def catches_count(self):
+        return self.catches.count()
 
 class Mission(models.Model):
     DIFFICULTY_CHOICES = [
@@ -39,6 +41,8 @@ class Mission(models.Model):
     points = models.IntegerField()
     is_daily = models.BooleanField(default=False)
     date = models.DateField(null=True, blank=True)
+    times_completed = models.IntegerField(default=0)
+    times_caught = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.text[:50]}..."
