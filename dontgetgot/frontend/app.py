@@ -87,5 +87,4 @@ def play_game(player_id: int):
                             ui.navigate.reload()
                         ui.button('Complete', on_click=complete)
 
-if __name__ == '__main__':
-    ui.run(port=8080)
+ui.run(port=8080)
